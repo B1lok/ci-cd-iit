@@ -24,3 +24,23 @@ jobs:
           file: ./Dockerfile
           push: true
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/iit-lab:latest
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Deploy to EC2
+        uses: appleboy/ssh-action@v0.1.10
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.SSH_KEY }}
+          script: |
+            echo "Pulling latest image..."
+            docker pull ${{ secrets.DOCKERHUB_USERNAME }}/iit-lab:latest
+            
+            echo "Stopping existing container..."
+            docker stop iit-lab || true
+            docker rm iit-lab || true
+            
+            echo "Running new container..."
+            docker run -d --name iit-lab -p 80:80 ${{ secrets.DOCKERHUB_USERNAME }}/iit-lab:latest
