@@ -52,14 +52,14 @@ jobs:
         id: tf-outputs
         run: |
           echo "ip=$(terraform output -raw external_ip)" >> $GITHUB_OUTPUT
-          terraform output -raw private_key > private_key.pem
-          chmod 600 private_key.pem
+          terraform output -raw private_key > $GITHUB_WORKSPACE/private_key.pem
+          chmod 600 $GITHUB_WORKSPACE/private_key.pem
       - name: Deploy to EC2
         uses: appleboy/ssh-action@v0.1.10
         with:
           host: ${{ steps.tf-outputs.outputs.ip }}
           username: ${{ secrets.EC2_USER }}
-          key_path: private_key.pem
+          key_path: ${{ github.workspace }}/private_key.pem
           script: |
             echo "Pulling latest image..."
             sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/iit-lab:latest
