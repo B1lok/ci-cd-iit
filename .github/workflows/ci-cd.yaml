@@ -46,7 +46,7 @@ jobs:
         run: terraform init -backend-config="credentials=creds.json"
 
       - name: Terraform Apply
-        run: terraform apply -auto-approve -var="credentials_file=creds.json" -var="docker_image=${{ secrets.DOCKERHUB_USERNAME }}/iit-lab:latest"
+        run: terraform apply -auto-approve -var="credentials_file=creds.json"
 
       - name: Get Terraform Outputs
         id: tf-outputs
